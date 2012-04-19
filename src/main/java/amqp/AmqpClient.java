@@ -83,6 +83,12 @@ abstract class AmqpClient {
   public static final String SERVER_DIRECT_EXCHANGE = "amq.direct";
   public static final String SERVER_FANOUT_EXCHANGE = "amq.fanout";
 
+  /**
+   * Rabbitmq client heartbeat interval
+   */
+  private static final int HEARTBEAT_INTERVAL = 150; // 2.5 minutes
+
+
   private final ConnectionFactory connectionFactory;
 
   /**
@@ -108,6 +114,7 @@ abstract class AmqpClient {
     connectionFactory.setVirtualHost(virtualHost);
     connectionFactory.setUsername(username);
     connectionFactory.setPassword(password);
+    connectionFactory.setRequestedHeartbeat(HEARTBEAT_INTERVAL);
   }
 
 	protected AmqpClient(String host, int port, String virtualHost, String username, String password, String keystoreFile, String keystorePassword, String truststoreFile, String truststorePassword, String[] ciphers) {
