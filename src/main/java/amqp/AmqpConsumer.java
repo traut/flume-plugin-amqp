@@ -284,17 +284,29 @@ class AmqpConsumer extends AmqpClient implements Runnable {
 
       } catch (IOException e) {
         if (e.getCause() instanceof ShutdownSignalException) {
-          logShutdownSignalException((ShutdownSignalException) e.getCause());
-          setRunning(false);
+          ShutdownSignalException ex = (ShutdownSignalException) e.getCause();
+	      if (ex.isHardError()) {
+	    	LOG.error("Connection error. Closing channel and waiting to reconnect", ex);
+	        closeChannelSilently(channel);
+	        channel = null;
+	      } else {
+            logShutdownSignalException(ex);
+            setRunning(false);
+	      }
         } else {
           LOG.info("IOException caught in Consumer Thread. Closing channel and waiting to reconnect", e);
           closeChannelSilently(channel);
           channel = null;
         }
-
       } catch (ShutdownSignalException e) {
-        logShutdownSignalException(e);
-        setRunning(false);
+    	if (e.isHardError()) {
+    	  LOG.error("Connection error. Closing channel and waiting to reconnect", e);
+          closeChannelSilently(channel);
+          channel = null;
+    	} else {
+          logShutdownSignalException(e);
+          setRunning(false);
+    	}
       }
     }
 
