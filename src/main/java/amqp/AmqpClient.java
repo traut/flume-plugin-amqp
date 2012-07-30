@@ -292,7 +292,7 @@ abstract class AmqpClient {
     // limit the possible wait time to MAX_RETRY_TIME
     long waitTime = backOffTime > MAX_RETRY_TIME ? MAX_RETRY_TIME : backOffTime;
 
-    LOG.debug("Waiting {} milliseconds before re-connect to broker...", waitTime);
+    LOG.info("Waiting {} milliseconds before re-connect to broker...", waitTime);
 
     synchronized (this) {
       wait(waitTime);

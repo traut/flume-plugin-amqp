@@ -113,10 +113,13 @@ class AmqpConsumer extends AmqpClient implements Runnable {
    */
   private volatile ShutdownSignalException exception;
 
+  private int prefetchCount;
+
   public AmqpConsumer(String host, int port, String virutalHost, String userName, String password,
                       String exchangeName, String exchangeType, boolean durableExchange,
                       String queueName, boolean durable, boolean exclusive, boolean autoDelete, String[] bindings,
-                      boolean useMessageTimestamp, String keystoreFile, String keystorePassword, String truststoreFile, String truststorePassword, String[] ciphers) {
+                      boolean useMessageTimestamp, String keystoreFile, String keystorePassword, String truststoreFile,
+                      String truststorePassword, String[] ciphers, int prefetchCount) {
     super(host, port, virutalHost, userName, password, keystoreFile, keystorePassword, truststoreFile, truststorePassword, ciphers);
 
     this.exchangeName = exchangeName;
@@ -128,6 +131,8 @@ class AmqpConsumer extends AmqpClient implements Runnable {
     this.autoDelete = autoDelete;
     this.bindings = bindings;
     this.useMessageTimestamp = useMessageTimestamp;
+    
+    this.prefetchCount = prefetchCount;
   }
 
   /**
@@ -246,6 +251,8 @@ class AmqpConsumer extends AmqpClient implements Runnable {
             // someone set the running flag to false
             break;
           }
+          
+          channel.basicQos(prefetchCount);
 
           // make declarations for consumer
           String queueName = declarationsForChannel(channel);
@@ -271,6 +278,7 @@ class AmqpConsumer extends AmqpClient implements Runnable {
             Event event = createEventFromDelivery(delivery);
 
             // add to queue
+	        LOG.debug("Message with tag " + delivery.getEnvelope().getDeliveryTag() + " received");
             events.put(event);
           }
         } else {
@@ -278,6 +286,7 @@ class AmqpConsumer extends AmqpClient implements Runnable {
         }
 
         channel.basicAck(delivery.getEnvelope().getDeliveryTag(), false);
+        LOG.debug("Ack for tag " + Long.toString(delivery.getEnvelope().getDeliveryTag()) + " sent out");
       } catch (InterruptedException e) {
         LOG.info("Consumer Thread was interrupted, shutting down...");
         setRunning(false);

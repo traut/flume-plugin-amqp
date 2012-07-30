@@ -55,10 +55,10 @@ public class AmqpEventSource extends EventSource.Base {
                          String exchangeName, String exchangeType, boolean durableExchange,
                          String queueName, boolean durable, boolean exclusive, boolean autoDelete, String[] bindings,
                          boolean useMessageTimestamp, String keystoreFile, String keystorePassword, String truststoreFile,
-                         String truststorePassword, String[] ciphers) {
+                         String truststorePassword, String[] ciphers, int pregetchCount) {
     consumer = new AmqpConsumer(host, port, virtualHost, userName, password,
         exchangeName, exchangeType, durableExchange, queueName, durable, exclusive, autoDelete,
-        bindings, useMessageTimestamp, keystoreFile, keystorePassword, truststoreFile, truststorePassword, ciphers);
+        bindings, useMessageTimestamp, keystoreFile, keystorePassword, truststoreFile, truststorePassword, ciphers, pregetchCount);
   }
 
   @Override
@@ -132,6 +132,7 @@ public class AmqpEventSource extends EventSource.Base {
                   "[,autoDeleteQueue=false] " +
                   "[,bindings=\"binding1,binding2,bindingN\"] " +
                   "[,useMessageTimestamp=false] " +
+                  "[,prefetchCount=amount] " +
                   "[,keystoreFile=/path/to/file.jks] " +
                   "[,keystorePassword=password] " +
                   "[,truststoreFile=/path/to/file.jks] " +
@@ -160,6 +161,7 @@ public class AmqpEventSource extends EventSource.Base {
         String truststoreFile = parser.getOptionValue("truststoreFile");
         String truststorePassword = parser.getOptionValue("truststorePassword");
         String[] ciphers = parser.getOptionValues("ciphers");
+        int prefetchCount = parser.getOptionValue("prefetchCount", 10);
         if (ciphers == null)
         	ciphers = AmqpConsumer.DEFAULT_CIPHERS;
 
@@ -170,7 +172,8 @@ public class AmqpEventSource extends EventSource.Base {
 
         return new AmqpEventSource(host, port, virtualHost, userName, password,
             exchangeName, exchangeType, durableExchange, queueName, durableQueue,
-            exclusiveQueue, autoDeleteQueue, bindings, useMessageTimestamp, keystoreFile, keystorePassword, truststoreFile, truststorePassword, ciphers);
+            exclusiveQueue, autoDeleteQueue, bindings, useMessageTimestamp, keystoreFile,
+            keystorePassword, truststoreFile, truststorePassword, ciphers, prefetchCount);
       }
     };
   }
