@@ -55,10 +55,10 @@ public class AmqpEventSource extends EventSource.Base {
                          String exchangeName, String exchangeType, boolean durableExchange,
                          String queueName, boolean durable, boolean exclusive, boolean autoDelete, String[] bindings,
                          boolean useMessageTimestamp, String keystoreFile, String keystorePassword, String truststoreFile,
-                         String truststorePassword, String[] ciphers, int pregetchCount) {
+                         String truststorePassword, String[] ciphers, int prefetchCount) {
     consumer = new AmqpConsumer(host, port, virtualHost, userName, password,
         exchangeName, exchangeType, durableExchange, queueName, durable, exclusive, autoDelete,
-        bindings, useMessageTimestamp, keystoreFile, keystorePassword, truststoreFile, truststorePassword, ciphers, pregetchCount);
+        bindings, useMessageTimestamp, keystoreFile, keystorePassword, truststoreFile, truststorePassword, ciphers, prefetchCount);
   }
 
   @Override
